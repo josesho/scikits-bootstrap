@@ -208,14 +208,30 @@ Efron, An Introduction to the Bootstrap. Chapman & Hall 1993
     # Instead, we can generate just the indexes, and then apply the statfun
     # to those indexes.
     if _iter:
-        bootindexes = bootstrap_indexes(tdata[0], n_samples)
-        stat = np.array([statfunction(*(x[indexes] for x in tdata))
-                         for indexes in bootindexes])
+        # Old code.
+        # bootindexes = bootstrap_indexes(tdata[0], n_samples)
+        # stat = np.array([statfunction(*(x[indexes] for x in tdata))
+        #                  for indexes in bootindexes])
+
+        # This allows for effect size computation for different-sized groups.
+        boot_indices = [list(bootstrap_indexes(t, n_samples))
+                        for t in tdata]
+        boot_indices = list(zip(*boot_indices))
+
+        stat = []
+
+        for b in boot_indices:
+            args = []
+            for j, _ in enumerate(tdata):
+                args.append( tdata[j][b[j]] )
+
+            stat.append( statfunction(*args) )
+
     else:
         bootindexes = bootstrap_indexes_array(tdata[0], n_samples)
         stat = statfunction(*(x[bootindexes] for x in tdata))
 
-    stat.sort(axis=0)
+    stat = np.sort(stat, axis=0)
 
     # Percentile Interval Method
     if method == 'pi':
