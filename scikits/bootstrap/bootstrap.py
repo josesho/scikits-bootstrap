@@ -60,10 +60,10 @@ data: array_like, shape (N, ...) OR tuple of array_like all with shape (N, ...)
     by the multi parameter.
 statfunction: function (data, weights=(weights, optional)) -> value
     This function should accept samples of data from ``data``. It is applied
-    to these samples individually. 
-    
-    If using the ABC method, the function _must_ accept a named ``weights`` 
-    parameter which will be an array_like with weights for each sample, and 
+    to these samples individually.
+
+    If using the ABC method, the function _must_ accept a named ``weights``
+    parameter which will be an array_like with weights for each sample, and
     must return a _weighted_ result. Otherwise this parameter is not used
     or required. Note that numpy's np.average accepts this. (default=np.average)
 alpha: float or iterable, optional
@@ -86,7 +86,7 @@ multi: boolean, optional
     If False, assume data is a single array. If True, assume data is a tuple/other
     iterable of arrays of the same length that should be sampled together. If None,
     decide based on whether the data is an actual tuple. (default=None)
-    
+
 Returns
 -------
 confidences: tuple of floats
@@ -96,8 +96,8 @@ Calculation Methods
 -------------------
 'pi': Percentile Interval (Efron 13.3)
     The percentile interval method simply returns the 100*alphath bootstrap
-    sample's values for the statistic. This is an extremely simple method of 
-    confidence interval calculation. However, it has several disadvantages 
+    sample's values for the statistic. This is an extremely simple method of
+    confidence interval calculation. However, it has several disadvantages
     compared to the bias-corrected accelerated method, which is the default.
 'bca': Bias-Corrected Accelerated (BCa) Non-Parametric (Efron 14.3) (default)
     This method is much more complex to explain. However, it gives considerably
@@ -109,10 +109,10 @@ Calculation Methods
     the acceleration value is undefined. To match the percentile interval method
     and give reasonable output, the implementation of this method returns a
     confidence interval of zero width using the 0th bootstrap sample in this
-    case, and warns the user.  
+    case, and warns the user.
 'abc': Approximate Bootstrap Confidence (Efron 14.4, 22.6)
     This method provides approximated bootstrap confidence intervals without
-    actually taking bootstrap samples. This requires that the statistic be 
+    actually taking bootstrap samples. This requires that the statistic be
     smooth, and allow for weighting of individual points with a weights=
     parameter (note that np.average allows this). This is _much_ faster
     than all other methods for situations where it can be used.
@@ -152,7 +152,7 @@ Efron, An Introduction to the Bootstrap. Chapman & Hall 1993
             def statfunc_wrapper(x, *args, **kwargs):
                 return np.average(x, axis=-1, *args, **kwargs)
             statfunction = statfunc_wrapper
-        
+
     # Ensure that the data is actually an array. This isn't nice to pandas,
     # but pandas seems much much slower and the indexes become a problem.
     if not multi:
@@ -261,7 +261,7 @@ Efron, An Introduction to the Bootstrap. Chapman & Hall 1993
             warnings.warn("BCa acceleration values for indexes {} were undefined. \
 Statistic values were likely all equal. Affected CI will \
 be inaccurate.".format(nanind), InstabilityWarning, stacklevel=2)
-        
+
         zs = z0 + nppf(alphas).reshape(alphas.shape+(1,)*z0.ndim)
 
         avals = ncdf(z0 + zs/(1-a*zs))
@@ -270,7 +270,7 @@ be inaccurate.".format(nanind), InstabilityWarning, stacklevel=2)
         raise ValueError("Method {0} is not supported.".format(method))
 
     nvals = np.round((n_samples-1)*avals)
-    
+
     oldnperr = np.seterr(invalid='ignore')
     if np.any(np.isnan(nvals)):
         warnings.warn("Some values were NaN; results are probably unstable " +
@@ -285,7 +285,7 @@ be inaccurate.".format(nanind), InstabilityWarning, stacklevel=2)
                       "results may be unstable.",
                       InstabilityWarning, stacklevel=2)
     np.seterr(**oldnperr)
-    
+
     nvals = np.nan_to_num(nvals).astype('int')
 
     if output == 'lowhigh':
@@ -304,8 +304,8 @@ be inaccurate.".format(nanind), InstabilityWarning, stacklevel=2)
             return abs(statfunction(data)-stat[(nvals, np.indices(nvals.shape)[1:])])[np.newaxis].T
     else:
         raise ValueError("Output option {0} is not supported.".format(output))
-    
-    
+
+
 
 
 def bootstrap_indexes(data, n_samples=10000):
@@ -317,7 +317,7 @@ of bootstrap indexes (with list(bootstrap_indexes(data))) as well.
     for _ in xrange(n_samples):
         yield randint(data.shape[0], size=(data.shape[0],))
 
-        
+
 def bootstrap_indexes_array(data, n_samples=10000):
     return randint(data.shape[0], size=(n_samples, data.shape[0]))
 
@@ -384,7 +384,7 @@ around to the beginning of the data again.
         last_block = n_obs
     else:
         last_block = n_obs - block_length
-    
+
     for _ in xrange(n_samples):
         blocks = np.random.randint(0, last_block, size=n_blocks)
         if not wrap:
