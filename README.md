@@ -26,6 +26,7 @@ by the Evans Foundation.
 
 Version Info
 ============
+v1.0.1: Compute effect sizes for groups with different Ns.
 
 v1.0.0: scikits.bootstrap now uses pyerf, which means that it doesn't actually
         need scipy at all.  It should work with PyPy, has some improved error
